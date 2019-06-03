@@ -31,7 +31,7 @@ pipeline {
           echo "${scannerHome}"
         }
 
-        withSonarQubeEnv('SonarQube Scanner') {
+        withSonarQubeEnv('sonar') {
           sh "${scannerHome}/bin/sonar-scanner"
         }
 
