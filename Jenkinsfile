@@ -62,13 +62,13 @@ pipeline {
           }
         }
         stage('Deploy Prod') {
-          when {
-            branch 'master'
-          }
           steps {
             sh 'sh \'./jenkins/scripts/deliver.sh\''
-            input(message: 'Deploy to Prod?', ok: 'Yes', parameters: [booleanParam(defaultValue: true, 
-                                    description: 'If you like Java, just push the button',name: 'Yes?')])
+            script {
+              def deploy= input(message: 'Deploy to Prod?', ok: 'Yes', parameters: [booleanParam(defaultValue: true,
+              description: 'If you like Java, just push the button',name: 'Yes?')])
+            }
+
           }
         }
       }
