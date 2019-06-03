@@ -32,12 +32,12 @@ pipeline {
         }
 
         withSonarQubeEnv('sonar') {
-          sh "mvn sonar:sonar"
+          sh 'mvn sonar:sonar'
         }
 
       }
     }
-    stage('Deliver') {
+    stage('Deploy') {
       when {
         branch 'stage'
       }
