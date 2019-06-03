@@ -24,9 +24,14 @@ pipeline {
                 }
             }
         }
+        stage('SonarQube analysis') {
+            withSonarQubeEnv('sonar') {
+              mvn sonar:sonar
+        }
+
         stage('Deliver') {
             when {
-                branch 'master'
+                branch 'stage'
             }
             steps {
                 sh './jenkins/scripts/deliver.sh'
