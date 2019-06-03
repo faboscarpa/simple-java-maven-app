@@ -25,8 +25,9 @@ pipeline {
             }
         }
         stage('SonarQube analysis') {
-            withSonarQubeEnv('sonar') {
-              mvn sonar:sonar
+                withSonarQubeEnv('sonar') {
+                  mvn sonar:sonar
+            }
         }
 
         stage('Deliver') {
