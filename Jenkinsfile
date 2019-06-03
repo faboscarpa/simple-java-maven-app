@@ -14,6 +14,7 @@ pipeline {
                 sh 'mvn -B -DskipTests clean package'
             }
         }
+
         stage('Test') {
             steps {
                 sh 'mvn test'
@@ -24,9 +25,16 @@ pipeline {
                 }
             }
         }
+
+        stage('SonarQube analysis') {
+                withSonarQubeEnv('sonar') {
+                  mvn sonar:sonar
+            }
+        }
+
         stage('Deliver') {
             when {
-                branch 'master'
+                branch 'stage'
             }
             steps {
                 sh './jenkins/scripts/deliver.sh'
