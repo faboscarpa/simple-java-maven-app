@@ -30,20 +30,14 @@ pipeline {
           scannerHome = tool 'sonarTool'
           echo "${scannerHome}"
         }
+
         withSonarQubeEnv('sonar') {
-          sh "${scannerHome}/bin/sonar-scanner"
+          sh 'mvn sonar:sonar'
         }
 
       }
     }
-    stage ('SonarQube Gatekeeper') {
-        def qualitygate = waitForQualityGate()
-        if (qualitygate.status != "OK") {
-         error "Pipeline aborted due to quality gate coverage failure: ${qualitygate.status}"
-        }
-
-    }
-    stage('Deliver') {
+    stage('Deploy') {
       when {
         branch 'stage'
       }
