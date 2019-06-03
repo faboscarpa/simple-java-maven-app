@@ -27,8 +27,11 @@ pipeline {
         }
 
         stage('SonarQube analysis') {
+                script {
+                  scannerHome = tool 'sonarTool'
+                }
                 withSonarQubeEnv('sonar') {
-                  mvn sonar:sonar
+                 sh "${scannerHome}/bin/sonar-scanner"
             }
         }
         stage("Quality Gate") {
