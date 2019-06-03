@@ -25,9 +25,15 @@ pipeline {
             }
         }
         stage('SonarQube analysis') {
-                withSonarQubeEnv('sonar') {
-                  mvn sonar:sonar
-            }
+                steps {
+                script {
+                  // requires SonarQube Scanner 2.8+
+                  scannerHome = tool 'sonarTool'
+                }
+                withSonarQubeEnv('SonarQube Scanner') {
+                  sh "${scannerHome}/bin/sonar-scanner"
+                }
+              }
         }
 
         stage('Deliver') {
