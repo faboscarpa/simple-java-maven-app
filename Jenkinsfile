@@ -38,8 +38,9 @@ pipeline {
       }
     }
    stage ('SonarQube Gatekeeper') {
-        timeout(time: 5, unit: 'MINUTES') {
-            steps {
+
+           steps {
+            timeout(time: 5, unit: 'MINUTES') {
                script {
                 def qualitygate = waitForQualityGate()
                 if (qualitygate.status != "OK") {
