@@ -63,10 +63,8 @@ pipeline {
         }
         stage('Deploy Prod') {
           steps {
-            sh 'sh \'./jenkins/scripts/deliver.sh\''
-            script {
-              def deploy= input(message: 'Deploy to Prod?', ok: 'Yes', parameters: [booleanParam(defaultValue: true,
-              description: 'If you like Java, just push the button',name: 'Yes?')])
+            waitUntil() {
+              input(message: 'deploy', id: 'deplot', ok: 'true')
             }
 
           }
