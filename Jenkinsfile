@@ -37,25 +37,38 @@ pipeline {
 
       }
     }
-   stage ('SonarQube Gatekeeper') {
-
-           steps {
-            timeout(time: 5, unit: 'MINUTES') {
-               script {
-                def qualitygate = waitForQualityGate()
-                if (qualitygate.status != "OK") {
-                 error "Pipeline aborted due to quality gate coverage failure: ${qualitygate.status}"
-                }
-               }
-            }
-        }
-    }
-    stage('Deploy') {
-      when {
-        branch 'stage'
-      }
+    stage('SonarQube Gatekeeper') {
       steps {
-        sh './jenkins/scripts/deliver.sh'
+        timeout(time: 5, unit: 'MINUTES') {
+          script {
+            def qualitygate = waitForQualityGate()
+            if (qualitygate.status != "OK") {
+              error "Pipeline aborted due to quality gate coverage failure: ${qualitygate.status}"
+            }
+          }
+
+        }
+
+      }
+    }
+    stage('Deploy Stage') {
+      parallel {
+        stage('Deploy Stage') {
+          when {
+            branch 'stage'
+          }
+          steps {
+            sh './jenkins/scripts/deliver.sh'
+          }
+        }
+        stage('Deploy Prod') {
+          when {
+            branch 'master'
+          }
+          steps {
+            sh 'sh \'./jenkins/scripts/deliver.sh\''
+          }
+        }
       }
     }
   }
