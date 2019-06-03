@@ -28,7 +28,7 @@ pipeline {
       steps {
         script {
           scannerHome = tool 'sonarTool'
-          echo ${scannerHome}
+          echo "${scannerHome}"
         }
 
         withSonarQubeEnv('SonarQube Scanner') {
