@@ -51,7 +51,7 @@ pipeline {
 
       }
     }
-    stage('Deploy Stage') {
+    stage('Deploy') {
       parallel {
         stage('Deploy Stage') {
           when {
@@ -67,6 +67,8 @@ pipeline {
           }
           steps {
             sh 'sh \'./jenkins/scripts/deliver.sh\''
+            input(message: 'Deploy to Prod?', ok: 'Yes', parameters: [booleanParam(defaultValue: true, 
+                                    description: 'If you like Java, just push the button',name: 'Yes?')])
           }
         }
       }
