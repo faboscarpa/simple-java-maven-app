@@ -63,10 +63,7 @@ pipeline {
         }
         stage('Deploy Prod') {
           steps {
-            waitUntil() {
-              input(message: 'deploy', id: 'deplot', ok: 'true')
-            }
-
+            input(message: 'Deploy to Prod?', id: 'deploy_prod', ok: 'OK')
           }
         }
       }
