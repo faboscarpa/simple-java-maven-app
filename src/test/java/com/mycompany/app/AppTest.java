@@ -52,7 +52,7 @@ public class AppTest
     }
 
     @Test
-    public void testAppMain2()
+    public void testAppMain3()
     {
         App.main(null);
         try {
