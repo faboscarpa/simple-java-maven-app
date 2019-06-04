@@ -62,11 +62,10 @@ pipeline {
           }
         }
         stage('Deploy Prod') {
+          when {
+            branch 'master'
+          }
           steps {
-            when() {
-              branch 'master'
-            }
-
             input(message: 'Deploy to Prod?', id: 'deploy_prod', ok: 'OK')
           }
         }
