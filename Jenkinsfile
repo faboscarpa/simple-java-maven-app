@@ -1,53 +1,78 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3-alpine'
-            args '-v /root/.m2:/root/.m2'
-        }
+  agent {
+    docker {
+      image 'maven:3-alpine'
+      args '-v /root/.m2:/root/.m2'
     }
-    options {
-        skipStagesAfterUnstable()
+
+  }
+  stages {
+    stage('Build') {
+      steps {
+        sh 'mvn -B -DskipTests clean package'
+      }
     }
-    stages {
-        stage('Build') {
-            steps {
-                sh 'mvn -B -DskipTests clean package'
-            }
+    stage('Test') {
+      post {
+        always {
+          junit 'target/surefire-reports/*.xml'
+
         }
 
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
-            }
+      }
+      steps {
+        sh 'mvn test'
+      }
+    }
+    stage('SonarQube analysis') {
+      steps {
+        script {
+          scannerHome = tool 'sonarTool'
+          echo "${scannerHome}"
         }
 
-        stage('SonarQube analysis') {
-                script {
-                  scannerHome = tool 'sonarTool'
-                }
-                withSonarQubeEnv('sonar') {
-                 sh "${scannerHome}/bin/sonar-scanner"
-            }
+        withSonarQubeEnv('sonar') {
+          sh 'mvn sonar:sonar'
         }
-        stage("Quality Gate") {
-            steps {
-              timeout(time: 1, unit: 'HOURS') {
-                waitForQualityGate abortPipeline: true
-              }
-            }
-        }
-        stage('Deliver') {
-            when {
-                branch 'stage'
-            }
-            steps {
-                sh './jenkins/scripts/deliver.sh'
-            }
-        }
+
+      }
     }
+    stage('SonarQube Gatekeeper') {
+      steps {
+        timeout(time: 5, unit: 'MINUTES') {
+          script {
+            def qualitygate = waitForQualityGate()
+            if (qualitygate.status != "OK") {
+              error "Pipeline aborted due to quality gate coverage failure: ${qualitygate.status}"
+            }
+          }
+
+        }
+
+      }
+    }
+    stage('Deploy') {
+      parallel {
+        stage('Deploy Stage') {
+          when {
+            branch 'stage'
+          }
+          steps {
+            sh './jenkins/scripts/deliver.sh'
+          }
+        }
+        stage('Deploy Prod') {
+          when {
+            branch 'master'
+          }
+          steps {
+            input(message: 'Deploy to Prod?', id: 'deploy_prod', ok: 'OK')
+          }
+        }
+      }
+    }
+  }
+  options {
+    skipStagesAfterUnstable()
+  }
 }
